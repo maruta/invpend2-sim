@@ -124,7 +124,7 @@ function u(r, x) {
     let xs = [x[0] - r, mod(x[1] + PI, 2 * PI) - PI, mod(x[2] + PI, 2 * PI) - PI, x[3], x[4], x[5]];
 
     Vx = 0.5 * quad_form(S, xs);
-    dVxdt = dVdt(x);
+    dVxdt = dVdt(xs);
     // mode transition rule
     switch (mode) {
         case 'lin':
