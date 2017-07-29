@@ -228,8 +228,8 @@ function draw_pend(x) {
     text(modestr[mode] + '\n' +
         'u(t)  = ' + fmtnum(ux / g) + ' g\n' +
         'E(t)  = ' + fmtnum(Ex) + ' J\n' +
-        'V(t)  = ' + fmtnum(Vx) + '\n' +
-        'dV(t) = ' + fmtnum(dVxdt), cw / 2 + 50, -200);
+        'V(t)  = ' + Vx.toFixed(3) + '\n' +
+        'dV(t) = ' + dVxdt.toFixed(3), cw / 2 + 50, -200);
     pop();
     // draw pendulum
     rotate(x[1]);
