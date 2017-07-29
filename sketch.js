@@ -128,13 +128,13 @@ function u(r, x) {
     // mode transition rule
     switch (mode) {
         case 'lin':
-            if (dVxdt > 1e-5 || Vx > 10) {
+            if (Vx > 4 && dVxdt>0) {
                 mode = 'swingup';
                 mode_last_change = millis();
             }
             break;
         case 'swingup':
-            if (Vx < 5 && dVxdt < -1e-5 && cos(xs[1]) > 0 && cos(xs[2]) > 0) {
+            if (Vx < 2 && dVxdt < 0 && cos(xs[1]) > 0 && cos(xs[2]) > 0) {
                 mode = 'lin';
                 mode_last_change = millis();
             }
@@ -151,7 +151,7 @@ function u(r, x) {
             break;
     }
     // limit power
-    ux = constrain(ux, -1000, 1000);
+    ux = constrain(ux, -100, 100);
     return ux;
 }
 
