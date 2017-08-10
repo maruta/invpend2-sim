@@ -303,25 +303,29 @@ function setup() {
     set_view();
 }
 
-function draw_marker(x) {
+function draw_marker(x, t) {
     let ts = 50;
-    triangle(x * 1e3, 0, x * 1e3 - ts / 2, +ts / 2 * sqrt(3), x * 1e3 + ts / 2, +ts / 2 * sqrt(3));
+    textSize(54);
+        textAlign(LEFT);
+        noStroke();
+        textAlign(RIGHT);
+        noStroke();
+        triangle(x * 1e3, 0, x * 1e3 - ts / 2, +ts / 2 * sqrt(3), x * 1e3 + ts / 2, +ts / 2 * sqrt(3));
+        textAlign(CENTER);
+        noStroke();
+    }
 }
 
 function draw_axis() {
     stroke(192, 198, 201);
     strokeWeight(2);
-    textSize(54);
-    fill(122, 126, 128);
-    strokeWeight(5);
-    textAlign(CENTER);
+    strokeWeight(4);
     for (var gx = floor(vxmin / 1000) * 1000; gx <= floor(vxmax / 1000) * 1000; gx += 1000) {
         noStroke();
-        text(gx / 1000 + ' m', gx, +48 + 40);
         stroke(122, 126, 128);
-        line(gx, 0, gx, 20);
+        line(gx, 0, gx, 40);
     }
-    strokeWeight(3);
+    strokeWeight(4);
     line(vxmin, 0, vxmax, 0)
 }
 
@@ -358,9 +362,7 @@ function draw() {
 
     noStroke();
     fill(255, 0, 0, 128);
-    draw_marker(r);
     fill(0, 0, 255, 128);
-    draw_marker(xt[0]);
 
     draw_pend(xt);
 
