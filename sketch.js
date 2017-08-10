@@ -306,13 +306,21 @@ function setup() {
 function draw_marker(x, t) {
     let ts = 50;
     textSize(54);
+    if (x * 1e3 < vxmin) {
+        triangle(vxmin, ts / 2, vxmin + ts / 2 * sqrt(3), 0, vxmin + ts / 2 * sqrt(3), ts);
         textAlign(LEFT);
         noStroke();
+        text(t, vxmin, 48 + 40);
+    } else if (x * 1e3 > vxmax) {
+        triangle(vxmax, ts / 2, vxmax - ts / 2 * sqrt(3), 0, vxmax - ts / 2 * sqrt(3), ts);
         textAlign(RIGHT);
         noStroke();
+        text(t, vxmax, 48 + 40);
+    } else {
         triangle(x * 1e3, 0, x * 1e3 - ts / 2, +ts / 2 * sqrt(3), x * 1e3 + ts / 2, +ts / 2 * sqrt(3));
         textAlign(CENTER);
         noStroke();
+        text(t, x * 1e3, 48 + 40);
     }
 }
 
@@ -362,7 +370,9 @@ function draw() {
 
     noStroke();
     fill(255, 0, 0, 128);
+    draw_marker(r, '\nr(t) = ' + r.toFixed(3) + ' m');
     fill(0, 0, 255, 128);
+    draw_marker(xt[0], 'x(t) = ' + xt[0].toFixed(3) + ' m');
 
     draw_pend(xt);
 
