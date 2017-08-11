@@ -219,7 +219,7 @@ function fmtnum(x) {
     return (x < 0 ? '' : ' ') + x.toFixed(3);
 }
 
-function draw_pend(x) {
+function draw_pend(x, alpha) {
     push();
 
     cw = 200;
@@ -231,8 +231,8 @@ function draw_pend(x) {
 
     // draw cart
     translate(x[0] * 1000, -ch / 2);
-    fill(232, 236, 239, 128);
-    stroke(77, 88, 89);
+    fill(232, 236, 239, 128 * alpha);
+    stroke(77, 88, 89, 255 * alpha);
     rect(-cw / 2, -ch / 2, cw, ch, cr, cr, cr, cr);
 
     // draw pendulum
@@ -242,17 +242,32 @@ function draw_pend(x) {
     rotate(x[2] - x[1]);
     rect(-pw2 / 2, -pw2 / 2 - l2 * 1000, pw2, l2 * 1000 + pw2, pr, pr, pr, pr);
     pop();
-
+    push();
     // draw cart
     translate(x[0] * 1000, -ch / 2);
     noFill();
-    stroke(77, 88, 89);
+    stroke(77, 88, 89, 255 * alpha);
     strokeWeight(5);
     rect(-cw / 2, -ch / 2, cw, ch, cr, cr, cr, cr);
-    fill(77, 88, 89, 128);
+    fill(77, 88, 89, 128 * alpha);
     ellipse(0, 0, 30, 30);
     noFill();
+
+    // draw pendulum
+    rotate(x[1]);
+    rect(-pw1 / 2, -pw1 / 2 - l1 * 1000, pw1, l1 * 1000 + pw1, pr, pr, pr, pr);
+    translate(0, -l1 * 1000);
+    rotate(x[2] - x[1]);
+    rect(-pw2 / 2, -pw2 / 2 - l2 * 1000, pw2, l2 * 1000 + pw2, pr, pr, pr, pr);
+    fill(77, 88, 89, 255 * alpha);
+    ellipse(0, 0, 30, 30);
+    noFill();
+    pop();
+}
+
+function draw_note(x) {
     push();
+    translate(x[0] * 1000, -ch / 2);
     textSize(48);
     fill(122, 126, 128);
     noStroke();
@@ -267,18 +282,6 @@ function draw_pend(x) {
         'V(t)  = ' + Vt.toFixed(3) + '\n' +
         'dV(t) = ' + dVtdt.toFixed(3), cw / 2 + 50, -200);
     pop();
-    // draw pendulum
-    rotate(x[1]);
-    rect(-pw1 / 2, -pw1 / 2 - l1 * 1000, pw1, l1 * 1000 + pw1, pr, pr, pr, pr);
-    translate(0, -l1 * 1000);
-    rotate(x[2] - x[1]);
-    rect(-pw2 / 2, -pw2 / 2 - l2 * 1000, pw2, l2 * 1000 + pw2, pr, pr, pr, pr);
-    fill(77, 88, 89);
-    ellipse(0, 0, 30, 30);
-    noFill();
-    pop();
-
-
 }
 
 function set_view() {
@@ -297,7 +300,30 @@ function windowResized() {
     set_view();
 }
 
+var x_hist;
+let hist_length = 20;
+
 function setup() {
+    var createRingBuffer = function (length) {
+
+        var pointer = 0,
+            buffer = [];
+
+        return {
+            get: function (key) {
+                let idx = mod((pointer - key - 1), length);
+                return buffer[idx];
+            },
+            push: function (item) {
+                buffer[pointer] = item;
+                pointer = (length + pointer + 1) % length;
+            }
+        };
+    };
+    x_hist = createRingBuffer(hist_length);
+    for (var i = 0; i < hist_length; i++) {
+        x_hist.push(xt.concat());
+    }
     createCanvas(windowWidth, windowHeight);
     frameRate(60);
     set_view();
@@ -374,8 +400,12 @@ function draw() {
     fill(0, 0, 255, 128);
     draw_marker(xt[0], 'x(t) = ' + xt[0].toFixed(3) + ' m');
 
-    draw_pend(xt);
-
+    for (var i = hist_length - 1; i >= 0; i--) {
+        draw_pend(x_hist.get(hist_length - i - 1), 0.1 / (hist_length + 1) * (i + 1) + 0.1);
+    }
+    draw_pend(xt, 1.0);
+    draw_note(xt);
+    x_hist.push(xt);
     current_mode = mode_transition(xt, current_mode);
     xt = rk4(function (t, x) {
         return add_vec(f(x), scale_vec(u(r, x, current_mode), B(x)));
