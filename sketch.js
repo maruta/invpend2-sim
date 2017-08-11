@@ -301,7 +301,8 @@ function windowResized() {
 }
 
 var x_hist;
-let hist_length = 20;
+let hist_length = 20,
+    num_phantom = 5;
 
 function setup() {
     var createRingBuffer = function (length) {
@@ -364,6 +365,7 @@ function draw_axis() {
 }
 
 var r = 0;
+var avrFPS = 60;
 
 function draw() {
     clear();
@@ -400,8 +402,8 @@ function draw() {
     fill(0, 0, 255, 128);
     draw_marker(xt[0], 'x(t) = ' + xt[0].toFixed(3) + ' m');
 
-    for (var i = hist_length - 1; i >= 0; i--) {
-        draw_pend(x_hist.get(hist_length - i - 1), 0.1 / (hist_length + 1) * (i + 1) + 0.1);
+    for (var i = 0; i < hist_length; i++) {
+        draw_pend(x_hist.get(i), 0.1 / (hist_length + 1) * (hist_length - i + 1) + 0.1);
     }
     draw_pend(xt, 1.0);
     draw_note(xt);
@@ -410,4 +412,10 @@ function draw() {
     xt = rk4(function (t, x) {
         return add_vec(f(x), scale_vec(u(r, x, current_mode), B(x)));
     }, xt, millis() * 1e-3, 1 / 60);
+    avrFPS = 0.9 * avrFPS + 0.1 * frameRate();
+    if (avrFPS < 55 && num_phantom > 1) {
+        num_phantom--;
+    } else if (avrFPS > 59 && num_phantom < hist_length) {
+        num_phantom++;
+    }
 }
