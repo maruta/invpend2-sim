@@ -411,6 +411,6 @@ function draw() {
     xt = rk4(function (t, x) {
         return add_vec(f(x), scale_vec(u(r, x, current_mode), B(x)));
     }, xt, millis() * 1e-3, 1 / 60);
-    num_phantom = num_phantom - 0.01*(60-frameRate())+0.05;
-    num_phantom = constrain(num_phantom,0,hist_length);
+    num_phantom = num_phantom - 0.01 * (60 - frameRate()) + 0.05 / (1 + millis() * 1e-3 / 10);
+    num_phantom = constrain(num_phantom, 0, hist_length);
 }
